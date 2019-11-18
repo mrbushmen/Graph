@@ -43,7 +43,7 @@ public class Graph : MonoBehaviour
             Debug.DrawLine(connectedPoints[i].pointA.Position, connectedPoints[i].pointB.Position);
         }
     }
-    
+
     /// <summary>
     /// Соединить две выбранные вершины
     /// </summary>
@@ -98,6 +98,58 @@ public class Graph : MonoBehaviour
                 Debug.Log("Conected2");
             }
         }
+    }
+
+    /// <summary>
+    /// Удалить ребро между выбранными вершинами
+    /// </summary>
+    public void DeleteEdge()
+    {
+        selectedPoints.Clear();
+
+        foreach (GameObject item in Selection.objects)
+        {
+            selectedPoints.Add(item.GetComponent<GraphPoint>());
+        }
+
+        if (selectedPoints.Count != 2)
+        {
+            Debug.LogError("Graph editor: Выбери две вершины!");
+        }
+        else
+        {
+            GraphPoint pointA = selectedPoints[0];
+            GraphPoint pointB = selectedPoints[1];
+            bool a = graph.ContainsKey(pointA);
+            bool b = graph.ContainsKey(pointB);
+
+            Debug.Log(a + " " + b);
+
+            if (a && b)
+            {
+                Disсonnect(pointA, pointB);
+            }
+        }
+    }
+
+    private void Disсonnect(GraphPoint pointA, GraphPoint pointB)
+    {
+        Edge r = new Edge(pointA, pointB);
+
+        foreach (var item in connectedPoints)
+        {
+            if (item == r)
+            {
+                connectedPoints.Remove(item);
+                graph[pointA].Remove(pointB);
+                graph[pointB].Remove(pointA);
+                edgeCount--;
+                Update();
+                break;
+            }
+        }
+
+        
     }
 
     private void Connect(GraphPoint pointA, GraphPoint pointB)

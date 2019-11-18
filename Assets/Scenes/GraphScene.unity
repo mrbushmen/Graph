@@ -271,7 +271,7 @@ GameObject:
   - component: {fileID: 900527136}
   - component: {fileID: 900527135}
   m_Layer: 0
-  m_Name: Point
+  m_Name: Point4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -300,7 +300,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 900527134}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.05, y: 14.68, z: -2.2006474}
+  m_LocalPosition: {x: 3.07, y: 11.78, z: -2.2006474}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -417,7 +417,7 @@ GameObject:
   - component: {fileID: 1243749600}
   - component: {fileID: 1243749599}
   m_Layer: 0
-  m_Name: Point (1)
+  m_Name: Point5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -446,7 +446,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1243749598}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.51, y: 2.6999998, z: -2.2006474}
+  m_LocalPosition: {x: -1.81, y: 0.23, z: -2.2006474}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -464,7 +464,7 @@ GameObject:
   - component: {fileID: 1451039540}
   - component: {fileID: 1451039539}
   m_Layer: 0
-  m_Name: Point
+  m_Name: Point2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -506,7 +506,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1451039538}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.37, y: 7.91, z: -2.2006474}
+  m_LocalPosition: {x: -5.11, y: 8.39, z: -2.2006474}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -523,7 +523,7 @@ GameObject:
   - component: {fileID: 1661144789}
   - component: {fileID: 1661144788}
   m_Layer: 0
-  m_Name: Point
+  m_Name: Point3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -552,7 +552,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1661144787}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.7, y: -1.89, z: -2.2006474}
+  m_LocalPosition: {x: 3.81, y: -0.9799991, z: -2.2006474}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -569,7 +569,7 @@ GameObject:
   - component: {fileID: 1670791484}
   - component: {fileID: 1670791483}
   m_Layer: 0
-  m_Name: Point
+  m_Name: Point1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -598,7 +598,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1670791482}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 5.01, y: 8.63, z: -2.2006474}
+  m_LocalPosition: {x: 6.43, y: 6.6, z: -2.2006474}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

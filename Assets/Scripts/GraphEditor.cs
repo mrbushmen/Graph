@@ -21,10 +21,9 @@ public class GraphEditor : EditorWindow
             FindObjectOfType<Graph>().DrawEdge();
         }
 
-        if (GUILayout.Button("Delete all edges"))
-        {
-            //TODO:
-            //FindObjectOfType<Graph>().DeleteEdge();
+        if (GUILayout.Button("Delete edge"))
+        {            
+            FindObjectOfType<Graph>().DeleteEdge();
         }
 
         if (GUILayout.Button("Delete all edges"))
