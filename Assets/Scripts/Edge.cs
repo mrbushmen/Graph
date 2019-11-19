@@ -1,11 +1,13 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
 
 /// <summary>
 /// Ребро графа
 /// </summary>
-[SelectionBase]
-public class Edge : MonoBehaviour
+[System.Serializable]
+public class Edge
 {
+    public List<int> points = new List<int>();
+
     public GraphPoint pointA;
     public GraphPoint pointB;
 
@@ -13,6 +15,8 @@ public class Edge : MonoBehaviour
     {
         pointA = a;
         pointB = b;
+        points.Add(a.Id);
+        points.Add(b.Id);
     }
 
     public static bool operator ==(Edge one, Edge two)
