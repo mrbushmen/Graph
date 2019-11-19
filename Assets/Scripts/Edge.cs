@@ -14,4 +14,18 @@ public class Edge : MonoBehaviour
         pointA = a;
         pointB = b;
     }
+
+    public static bool operator ==(Edge one, Edge two)
+    {
+        bool result = (one.pointA == two.pointA) && (one.pointB == two.pointB);
+        result |= (one.pointA == two.pointB) && (one.pointB == two.pointA);
+        return result;
+    }
+
+    public static bool operator !=(Edge one, Edge two)
+    {
+        bool result = (one.pointA == two.pointA) && (one.pointB == two.pointB);
+        result |= (one.pointA == two.pointB) && (one.pointB == two.pointA);
+        return !result;
+    }
 }
