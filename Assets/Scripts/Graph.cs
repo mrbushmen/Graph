@@ -9,7 +9,7 @@ using UnityEditor;
 public class Graph : MonoBehaviour
 {
     private List<Transform> allObjects = new List<Transform>();
-    private List<GraphPoint> points = new List<GraphPoint>();
+    private List<GraphPoint> graphPoints = new List<GraphPoint>();
 
     private List<GraphPoint> selectedPoints = new List<GraphPoint>();
     private LineRenderer lineRenderer;
@@ -19,12 +19,58 @@ public class Graph : MonoBehaviour
     public List<Edge> connectedPoints = new List<Edge>();
 
     private int[,] matrix=new int[50,50];
+    private float[,] sizeMatrix=new float[50, 50];
+
+    private float[] d = new float[50];
+
+    //список посещенных вершин
+    private List<int> passed = new List<int>();
+    //список оставшихся вершин
+    private List<int> points  = new List<int>();
+
+    public void FindPath()
+    {
+        selectedPoints.Clear();
+
+        foreach (GameObject item in Selection.objects)
+        {
+            selectedPoints.Add(item.GetComponent<GraphPoint>());
+        }
+        if (selectedPoints.Count != 2)
+        {
+            Debug.LogError("Graph editor: Выбери две вершины!");
+        }
+        else
+        {
+            GraphPoint pointA = selectedPoints[0];
+            GraphPoint pointB = selectedPoints[1];
+            //TODO: поиск кратчайшего пути
+
+            var c = pointA.Id;
+            passed.Add(c);
+            float min = float.MaxValue;
+            int minC = c;
+
+            for (int i = 1; i <= GraphPoint.count; i++)
+            {
+                if (! passed.Contains(c))
+                {
+                    if ( sizeMatrix[i, c]<min)
+                    {
+                        min = sizeMatrix[i, c];
+                        minC = c;
+                    }
+                }
+            }
+            passed.Add(c);
+        }
+    }
+
 
     private void Init()
     {
-        points.AddRange(FindObjectsOfType<GraphPoint>());
-
-        foreach (var item in points)
+        graphPoints.AddRange(FindObjectsOfType<GraphPoint>());
+        foreach (var item in graphPoints)
         {
             allObjects.Add(item.GetComponent<Transform>());
         }
@@ -126,7 +172,15 @@ public class Graph : MonoBehaviour
         matrix[pointA.Id, pointB.Id] = 1;
         matrix[pointB.Id, pointA.Id] = 1;
         edgeCount++;
-        connectedPoints.Add(new Edge(pointA, pointB));
+
+        var edge = new Edge(pointA, pointB);
+        connectedPoints.Add(edge);
+
+        sizeMatrix[pointA.Id, pointB.Id] = edge.Size;
+        sizeMatrix[pointB.Id, pointA.Id] = edge.Size;
+
+        Debug.Log("Size= " + edge.Size);
+
         Update();
     }    
 
@@ -145,4 +199,6 @@ public class Graph : MonoBehaviour
             }
         }
     }
+
+    
 }
