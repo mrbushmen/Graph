@@ -13,11 +13,12 @@ public class Graph : MonoBehaviour
 
     private List<GraphPoint> selectedPoints = new List<GraphPoint>();
     private LineRenderer lineRenderer;
-
-    private Dictionary<GraphPoint, List<GraphPoint>> graph = new Dictionary<GraphPoint, List<GraphPoint>>();
+    
     private int edgeCount = 0;
 
-    private List<Edge> connectedPoints = new List<Edge>();
+    public List<Edge> connectedPoints = new List<Edge>();
+
+    private int[,] matrix=new int[50,50];
 
     private void Init()
     {
@@ -55,7 +56,6 @@ public class Graph : MonoBehaviour
         {
             selectedPoints.Add(item.GetComponent<GraphPoint>());
         }
-
         if (selectedPoints.Count != 2)
         {
             Debug.LogError("Graph editor: Выбери две вершины!");
@@ -64,38 +64,13 @@ public class Graph : MonoBehaviour
         {
             GraphPoint pointA = selectedPoints[0];
             GraphPoint pointB = selectedPoints[1];
-            bool a = graph.ContainsKey(pointA);
-            bool b = graph.ContainsKey(pointB);
+            int A = pointA.Id;
+            int B = pointB.Id;
 
-            Debug.Log(a + " " + b);
-
-            if (a && b)
+            if (matrix[A, B] != 1)
             {
-                if (graph[pointA].Contains(pointB))
-                {
-                    Debug.Log("Return");
-                    return;
-                }
-                else
-                {
-                    Debug.Log("Conected1");
-                    Connect(pointA, pointB);
-                }
-            }
-            else
-            {
-                if (!a)
-                {
-                    graph.Add(pointA, new List<GraphPoint>());
-                    Debug.Log("AddA");
-                }
-                if (!b)
-                {
-                    graph.Add(pointB, new List<GraphPoint>());
-                    Debug.Log("AddB");
-                }
                 Connect(pointA, pointB);
-                Debug.Log("Conected2");
+                Debug.Log(string.Format("Conected {0}, {1}", pointA.Id, pointB.Id));
             }
         }
     }
@@ -120,46 +95,40 @@ public class Graph : MonoBehaviour
         {
             GraphPoint pointA = selectedPoints[0];
             GraphPoint pointB = selectedPoints[1];
-            bool a = graph.ContainsKey(pointA);
-            bool b = graph.ContainsKey(pointB);
+            bool isConnected = matrix[pointA.Id,pointB.Id]==1;
 
-            Debug.Log(a + " " + b);
+            Debug.Log(string.Format("Deleting edge {0}, {1}...", pointA.Id, pointB.Id));
 
-            if (a && b)
+            if (isConnected)
             {
                 Disсonnect(pointA, pointB);
             }
         }
     }
-
     private void Disсonnect(GraphPoint pointA, GraphPoint pointB)
     {
-        Edge r = new Edge(pointA, pointB);
-
-        foreach (var item in connectedPoints)
+        for (int i = 0; i < connectedPoints.Count; i++)
         {
-            if (item == r)
+            if (connectedPoints[i].points.Contains(pointA.Id) && connectedPoints[i].points.Contains(pointB.Id))
             {
-                connectedPoints.Remove(item);
-                graph[pointA].Remove(pointB);
-                graph[pointB].Remove(pointA);
+                connectedPoints.Remove(connectedPoints[i]);
+                matrix[pointA.Id, pointB.Id] = 0;
+                matrix[pointB.Id, pointA.Id] = 0;
                 edgeCount--;
                 Update();
                 break;
             }
         }
-
-        
     }
 
     private void Connect(GraphPoint pointA, GraphPoint pointB)
     {
-        graph[pointA].Add(pointB);
-        graph[pointB].Add(pointA);
+        matrix[pointA.Id, pointB.Id] = 1;
+        matrix[pointB.Id, pointA.Id] = 1;
         edgeCount++;
         connectedPoints.Add(new Edge(pointA, pointB));
         Update();
-    }
+    }    
 
     /// <summary>
     /// Удалить все ребра
@@ -168,6 +137,12 @@ public class Graph : MonoBehaviour
     {
         edgeCount = 0;
         connectedPoints.Clear();
-        graph.Clear();
+        for (int i = 0; i < 50; i++)
+        {
+            for (int j = 0; i < 50; i++)
+            {
+                matrix[i, j] = 0;
+            }
+        }
     }
 }

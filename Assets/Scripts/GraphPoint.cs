@@ -6,6 +6,8 @@
 [ExecuteInEditMode]
 public class GraphPoint : MonoBehaviour
 {
+    private static int count = 0;
+
     [SerializeField]
     private Color32 color = new Color32(0, 255, 150, 255);
 
@@ -15,6 +17,21 @@ public class GraphPoint : MonoBehaviour
     public Vector3 Position
     {
         get => transform.position;
+    }
+
+    //TODO: после отладки заменить поле свойством
+    //public int Id { get; private set; } = 0;
+    public int Id = 0;
+
+    private void OnEnable()
+    {
+        count++;
+        Id = count;
+    }
+
+    private void OnDisable()
+    {
+        count--;
     }
 
     private void OnDrawGizmos()
