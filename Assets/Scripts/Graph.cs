@@ -13,8 +13,7 @@ public class Graph : MonoBehaviour
 
     private List<GraphPoint> selectedPoints = new List<GraphPoint>();
     private LineRenderer lineRenderer;
-
-    private Dictionary<GraphPoint, List<GraphPoint>> graph = new Dictionary<GraphPoint, List<GraphPoint>>();
+    
     private int edgeCount = 0;
 
     public List<Edge> connectedPoints = new List<Edge>();
@@ -35,7 +34,7 @@ public class Graph : MonoBehaviour
 
     private void OnEnable()
     {
-        DeleteAllEdgesForMatrix();
+        DeleteAllEdges();
     }
 
     private void Update()
@@ -51,7 +50,29 @@ public class Graph : MonoBehaviour
     /// </summary>
     public void DrawEdge()
     {
-        DrawEdgeForMatrix();
+        selectedPoints.Clear();
+
+        foreach (GameObject item in Selection.objects)
+        {
+            selectedPoints.Add(item.GetComponent<GraphPoint>());
+        }
+        if (selectedPoints.Count != 2)
+        {
+            Debug.LogError("Graph editor: Выбери две вершины!");
+        }
+        else
+        {
+            GraphPoint pointA = selectedPoints[0];
+            GraphPoint pointB = selectedPoints[1];
+            int A = pointA.Id;
+            int B = pointB.Id;
+
+            if (matrix[A, B] != 1)
+            {
+                Connect(pointA, pointB);
+                Debug.Log(string.Format("Conected {0}, {1}", pointA.Id, pointB.Id));
+            }
+        }
     }
 
     /// <summary>
@@ -74,17 +95,17 @@ public class Graph : MonoBehaviour
         {
             GraphPoint pointA = selectedPoints[0];
             GraphPoint pointB = selectedPoints[1];
-            bool a = matrix[pointA.Id,pointB.Id]==1;
+            bool isConnected = matrix[pointA.Id,pointB.Id]==1;
 
             Debug.Log(string.Format("Deleting edge {0}, {1}...", pointA.Id, pointB.Id));
 
-            if (a)
+            if (isConnected)
             {
-                DisсonnectForMatrix(pointA, pointB);
+                Disсonnect(pointA, pointB);
             }
         }
     }
-    private void DisсonnectForMatrix(GraphPoint pointA, GraphPoint pointB)
+    private void Disсonnect(GraphPoint pointA, GraphPoint pointB)
     {
         for (int i = 0; i < connectedPoints.Count; i++)
         {
@@ -100,167 +121,19 @@ public class Graph : MonoBehaviour
         }
     }
 
-
-    private void Disсonnect(GraphPoint pointA, GraphPoint pointB)
-    {
-        Edge r = new Edge(pointA, pointB);
-
-        foreach (var item in connectedPoints)
-        {
-            if (item == r)
-            {
-                connectedPoints.Remove(item);
-                graph[pointA].Remove(pointB);
-                graph[pointB].Remove(pointA);
-                edgeCount--;
-                Update();
-                break;
-            }
-        }
-    }
-
-    private void DeleteEdgeForDictionary()
-    {
-        selectedPoints.Clear();
-
-        foreach (GameObject item in Selection.objects)
-        {
-            selectedPoints.Add(item.GetComponent<GraphPoint>());
-        }
-
-        if (selectedPoints.Count != 2)
-        {
-            Debug.LogError("Graph editor: Выбери две вершины!");
-        }
-        else
-        {
-            GraphPoint pointA = selectedPoints[0];
-            GraphPoint pointB = selectedPoints[1];
-            bool a = graph.ContainsKey(pointA);
-            bool b = graph.ContainsKey(pointB);
-
-            Debug.Log(a + " " + b);
-
-            if (a && b)
-            {
-                Disсonnect(pointA, pointB);
-            }
-        }
-    }
-
-    private void DrawEdgeForDictionary()
-    {
-        selectedPoints.Clear();
-
-        foreach (GameObject item in Selection.objects)
-        {
-            selectedPoints.Add(item.GetComponent<GraphPoint>());
-        }
-
-        if (selectedPoints.Count != 2)
-        {
-            Debug.LogError("Graph editor: Выбери две вершины!");
-        }
-        else
-        {
-            GraphPoint pointA = selectedPoints[0];
-            GraphPoint pointB = selectedPoints[1];
-            bool a = graph.ContainsKey(pointA);
-            bool b = graph.ContainsKey(pointB);
-
-
-
-            Debug.Log(a + " " + b);
-
-            if (a && b)
-            {
-                if (graph[pointA].Contains(pointB))
-                {
-                    Debug.Log("Return");
-                    return;
-                }
-                else
-                {
-                    Debug.Log("Conected1");
-                    Connect(pointA, pointB);
-                }
-            }
-            else
-            {
-                if (!a)
-                {
-                    graph.Add(pointA, new List<GraphPoint>());
-                    Debug.Log("AddA");
-                }
-                if (!b)
-                {
-                    graph.Add(pointB, new List<GraphPoint>());
-                    Debug.Log("AddB");
-                }
-                Connect(pointA, pointB);
-                Debug.Log("Conected2");
-            }
-        }
-    }
-
-
-    private void DrawEdgeForMatrix()
-    {
-        selectedPoints.Clear();
-
-        foreach (GameObject item in Selection.objects)
-        {
-            selectedPoints.Add(item.GetComponent<GraphPoint>());
-        }
-
-        if (selectedPoints.Count != 2)
-        {
-            Debug.LogError("Graph editor: Выбери две вершины!");
-        }
-        else
-        {
-            GraphPoint pointA = selectedPoints[0];
-            GraphPoint pointB = selectedPoints[1];
-            int A = pointA.Id;
-            int B = pointB.Id;
-
-            if (matrix[A, B] != 1)
-            {
-                ConnectForMatrix(pointA, pointB);
-                Debug.Log("Conected");
-            }
-        }
-    }
-
-    private void ConnectForMatrix(GraphPoint pointA, GraphPoint pointB)
+    private void Connect(GraphPoint pointA, GraphPoint pointB)
     {
         matrix[pointA.Id, pointB.Id] = 1;
         matrix[pointB.Id, pointA.Id] = 1;
         edgeCount++;
         connectedPoints.Add(new Edge(pointA, pointB));
         Update();
-    }
-
-    private void Connect(GraphPoint pointA, GraphPoint pointB)
-    {
-        graph[pointA].Add(pointB);
-        graph[pointB].Add(pointA);
-        edgeCount++;
-        connectedPoints.Add(new Edge(pointA, pointB));
-        Update();
-    }
+    }    
 
     /// <summary>
     /// Удалить все ребра
     /// </summary>
     public void DeleteAllEdges()
-    {
-        edgeCount = 0;
-        connectedPoints.Clear();
-        graph.Clear();
-    }
-
-    public void DeleteAllEdgesForMatrix()
     {
         edgeCount = 0;
         connectedPoints.Clear();

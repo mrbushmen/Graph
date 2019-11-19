@@ -19,6 +19,7 @@ public class GraphPoint : MonoBehaviour
         get => transform.position;
     }
 
+    //TODO: после отладки заменить поле свойством
     //public int Id { get; private set; } = 0;
     public int Id = 0;
 
