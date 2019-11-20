@@ -76,50 +76,39 @@ public class Graph : MonoBehaviour
             float min = 99999f;
             int minC = c;
             passed.Add(c);
-
             path.Clear();
 
-            while (passed.Count < GraphPoint.count && c != e)
+            while (passed.Count<GraphPoint.count)
             {
-                for (int j = 1; j <= GraphPoint.count; j++)
-                {
-                    if (!passed.Contains(j))
-                    {
-                        //если расстояние до вершины меньше, чем минимальное + расстояние до текущей
-                        if (d[j] < min)
-                        {
-                            min = d[j];
-                            minC = j;
-                        }
-                    }
-                }
-                
-                c = minC;
-                Debug.LogError(c);
-                if (!path.Contains(minC))
-                {
-                    path.Add(minC);
-                }
-
+                min = 99999f;
                 for (int i = 1; i <= GraphPoint.count; i++)
                 {
                     if (!passed.Contains(i))
                     {
-                        if (d[i] > min + sizeMatrix[i, c] && matrix[i, c] == 1)
+                        if (d[i] < min)
                         {
-                            d[i] = min + sizeMatrix[i, c];
+                            min = d[i];
+                            minC = i;
                         }
                     }
                 }
+                c = minC;
                 passed.Add(c);
+                for (int i = 1; i <= GraphPoint.count; i++)
+                {
+                    if (!passed.Contains(i) && sizeMatrix[i, c]!=0f)
+                    {
+                        d[i] = Mathf.Min(d[i], d[c] + sizeMatrix[i, c]);
+                    }
+                }
+                Debug.Log("Вершина и путь до нее"+c + " " + d[c]);
             }
-
-            string s = "";
-            foreach (var item in path)
+            string str="";
+            for (int i = 1; i <= GraphPoint.count; i++)
             {
-                s += " " + item;
+                str += d[i].ToString() + "   ";
             }
-            Debug.Log(s);
+            Debug.Log(str);
         }
     }
 
@@ -133,6 +122,15 @@ public class Graph : MonoBehaviour
         }
 
         lineRenderer = GetComponent<LineRenderer>();
+
+        for (int i = 0; i < 50; i++)
+        {
+            for (int j = 0; j < 50; j++)
+            {
+                sizeMatrix[i, j] = 99999f;
+            }
+        }
+
     }
 
     private void OnEnable()

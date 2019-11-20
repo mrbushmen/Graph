@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 
 /// <summary>
 /// Ребро графа
@@ -14,7 +15,7 @@ public class Edge
     public float Size
     {
         //TODO: переписать?
-        get => UnityEngine.Vector3.Distance(pointA.Position, pointB.Position);
+        get => (float) Math.Round( UnityEngine.Vector3.Distance(pointA.Position, pointB.Position),1);
     }
 
     public Edge(GraphPoint a, GraphPoint b)
