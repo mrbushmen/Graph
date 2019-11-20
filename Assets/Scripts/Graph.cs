@@ -21,12 +21,12 @@ public class Graph : MonoBehaviour
     private int[,] matrix = new int[50, 50];
     private float[,] sizeMatrix = new float[50, 50];
 
-    private float[] d = new float[50];
+    private float[] d = new float[7];
 
     //список посещенных вершин
     private List<int> passed = new List<int>();
     //список оставшихся вершин
-    private List<int> points = new List<int>();
+    private List<int> path = new List<int>();
 
     public void FindPath()
     {
@@ -47,9 +47,9 @@ public class Graph : MonoBehaviour
             //TODO: поиск кратчайшего пути
             passed.Clear();
 
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 6; i++)
             {
-                d[i] = float.MaxValue;
+                d[i] = 99999f;
             }
 
             //Начало пути
@@ -57,7 +57,7 @@ public class Graph : MonoBehaviour
             //Конец пути
             int e = pointB.Id;
 
-            for (int i = 0; i < 50; i++)
+            for (int i = 0; i < 6; i++)
             {
                 //Если между вершинами есть ребро, заносим его длину в массив
                 if (matrix[c, i] == 1)
@@ -69,62 +69,57 @@ public class Graph : MonoBehaviour
                     if (c == i)
                         d[i] = 0;
                     else
-                        d[i] = float.MaxValue;
+                        d[i] = 99999f;
                 }
             }
 
-            float min = float.MaxValue;
+            float min = 99999f;
             int minC = c;
-            while (passed.Count < GraphPoint.count && c!=e)
+            passed.Add(c);
+
+            path.Clear();
+
+            while (passed.Count < GraphPoint.count && c != e)
             {
-                for (int i = 0; i < GraphPoint.count; i++)
+                for (int j = 1; j <= GraphPoint.count; j++)
                 {
-                    //если расстояние до вершины меньше, чем минимальное + расстояние до текущей
-                    if (d[i] < min + d[c] && d[i] != 0 && !passed.Contains(i))
+                    if (!passed.Contains(j))
                     {
-                        min = d[i];
-                        minC = i;
+                        //если расстояние до вершины меньше, чем минимальное + расстояние до текущей
+                        if (d[j] < min)
+                        {
+                            min = d[j];
+                            minC = j;
+                        }
+                    }
+                }
+                
+                c = minC;
+                Debug.LogError(c);
+                if (!path.Contains(minC))
+                {
+                    path.Add(minC);
+                }
+
+                for (int i = 1; i <= GraphPoint.count; i++)
+                {
+                    if (!passed.Contains(i))
+                    {
+                        if (d[i] > min + sizeMatrix[i, c] && matrix[i, c] == 1)
+                        {
+                            d[i] = min + sizeMatrix[i, c];
+                        }
                     }
                 }
                 passed.Add(c);
-                c = minC;
-                Debug.LogError(c);
-
-                for (int i = 0; i < 50; i++)
-                {
-                    //Если между вершинами есть ребро, заносим его длину в массив
-                    if (matrix[c, i] == 1 && !passed.Contains(i))
-                    {
-                        d[i] = sizeMatrix[c, i]+min;
-                    }
-                    else
-                    {
-                        if (c == i)
-                            d[i] = min;
-                        else
-                            d[i] = float.MaxValue;
-                    }
-                }
             }
 
-
-            //var c = pointA.Id;
-            //passed.Add(c);
-            //float min = float.MaxValue;
-            //int minC = c;
-
-            //for (int i = 1; i <= GraphPoint.count; i++)
-            //{
-            //    if (! passed.Contains(c))
-            //    {
-            //        if ( sizeMatrix[i, c]<min)
-            //        {
-            //            min = sizeMatrix[i, c];
-            //            minC = c;
-            //        }
-            //    }
-            //}
-            //passed.Add(c);
+            string s = "";
+            foreach (var item in path)
+            {
+                s += " " + item;
+            }
+            Debug.Log(s);
         }
     }
 
