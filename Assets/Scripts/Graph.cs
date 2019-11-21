@@ -28,6 +28,8 @@ public class Graph : MonoBehaviour
     //список оставшихся вершин
     private List<int> path = new List<int>();
 
+    private int[] p = new int[7];
+
     public void FindPath()
     {
         selectedPoints.Clear();
@@ -71,6 +73,7 @@ public class Graph : MonoBehaviour
                     else
                         d[i] = 99999f;
                 }
+                p[i] = 0;
             }
 
             float min = 99999f;
@@ -78,7 +81,7 @@ public class Graph : MonoBehaviour
             passed.Add(c);
             path.Clear();
 
-            while (passed.Count<GraphPoint.count)
+            while (passed.Count < GraphPoint.count)
             {
                 min = 99999f;
                 for (int i = 1; i <= GraphPoint.count; i++)
@@ -92,23 +95,39 @@ public class Graph : MonoBehaviour
                         }
                     }
                 }
+                if (passed.Count==1)
+                {
+                    p[minC] = c;
+                }
                 c = minC;
                 passed.Add(c);
                 for (int i = 1; i <= GraphPoint.count; i++)
                 {
-                    if (!passed.Contains(i) && sizeMatrix[i, c]!=0f)
+                    if (!passed.Contains(i) && sizeMatrix[i, c] != 0f)
                     {
                         d[i] = Mathf.Min(d[i], d[c] + sizeMatrix[i, c]);
+                        p[i] = c;
                     }
                 }
-                Debug.Log("Вершина и путь до нее"+c + " " + d[c]);
+                Debug.Log("Вершина и путь до нее" + c + " " + d[c]);
             }
-            string str="";
+            string str = "";
             for (int i = 1; i <= GraphPoint.count; i++)
             {
                 str += d[i].ToString() + "   ";
             }
             Debug.Log(str);
+
+            c = pointA.Id;
+            int k = pointB.Id;
+            int h = 0;
+            while (k != c && h<6)
+            {
+                Debug.LogError("Path: " + k);
+                k = p[k];
+                h++;
+            }
+            Debug.LogError("Path: " + k);
         }
     }
 
