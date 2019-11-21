@@ -21,14 +21,14 @@ public class Graph : MonoBehaviour
     private int[,] matrix = new int[50, 50];
     private float[,] sizeMatrix = new float[50, 50];
 
-    private float[] d = new float[7];
+    private float[] d = new float[20];
 
     //список посещенных вершин
     private List<int> passed = new List<int>();
     //список оставшихся вершин
     private List<int> path = new List<int>();
 
-    private int[] p = new int[7];
+    private int[] p = new int[20];
 
     public void FindPath()
     {
@@ -49,7 +49,7 @@ public class Graph : MonoBehaviour
             //TODO: поиск кратчайшего пути
             passed.Clear();
 
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < GraphPoint.count; i++)
             {
                 d[i] = 99999f;
             }
@@ -59,7 +59,7 @@ public class Graph : MonoBehaviour
             //Конец пути
             int e = pointB.Id;
 
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < GraphPoint.count; i++)
             {
                 //Если между вершинами есть ребро, заносим его длину в массив
                 if (matrix[c, i] == 1)
@@ -81,8 +81,22 @@ public class Graph : MonoBehaviour
             passed.Add(c);
             path.Clear();
 
+            Debug.LogError("C=" + c);
+
+            string str = "";
+            for (int i = 0; i < p.Length; i++)
+            {
+                p[i] = c;
+            }
+
             while (passed.Count < GraphPoint.count)
             {
+                str = "";
+                for (int i = 1; i <= GraphPoint.count; i++)
+                {
+                    str += d[i].ToString() + "   ";
+                }
+                Debug.Log(str);
                 min = 99999f;
                 for (int i = 1; i <= GraphPoint.count; i++)
                 {
@@ -95,7 +109,7 @@ public class Graph : MonoBehaviour
                         }
                     }
                 }
-                if (passed.Count==1)
+                if (passed.Count == 1)
                 {
                     p[minC] = c;
                 }
@@ -105,13 +119,17 @@ public class Graph : MonoBehaviour
                 {
                     if (!passed.Contains(i) && sizeMatrix[i, c] != 0f)
                     {
-                        d[i] = Mathf.Min(d[i], d[c] + sizeMatrix[i, c]);
-                        p[i] = c;
+                        float length = d[c] + sizeMatrix[i, c];
+                        if (d[i] > length)
+                        {
+                            d[i] = length;
+                            p[i] = c;
+                        }
                     }
                 }
                 Debug.Log("Вершина и путь до нее" + c + " " + d[c]);
             }
-            string str = "";
+            str = "";
             for (int i = 1; i <= GraphPoint.count; i++)
             {
                 str += d[i].ToString() + "   ";
@@ -121,13 +139,35 @@ public class Graph : MonoBehaviour
             c = pointA.Id;
             int k = pointB.Id;
             int h = 0;
-            while (k != c && h<6)
+            graphPoints.AddRange(FindObjectsOfType<GraphPoint>());
+            lineRenderer = GetComponent<LineRenderer>();
+            lineRenderer.positionCount = 0;
+            while (k != c && h < GraphPoint.count)
             {
                 Debug.LogError("Path: " + k);
+                foreach (var item in graphPoints)
+                {
+                    if (item.Id == k)
+                    {
+                        lineRenderer.positionCount++;
+                        lineRenderer.SetPosition(lineRenderer.positionCount - 1, item.Position);
+                    }
+                }
+
                 k = p[k];
+
+
                 h++;
             }
             Debug.LogError("Path: " + k);
+            foreach (var item in graphPoints)
+            {
+                if (item.Id == k)
+                {
+                    lineRenderer.positionCount++;
+                    lineRenderer.SetPosition(lineRenderer.positionCount - 1, item.Position);
+                }
+            }
         }
     }
 
