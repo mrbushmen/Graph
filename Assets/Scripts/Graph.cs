@@ -11,44 +11,33 @@ public class Graph : MonoBehaviour
     private const float INF = 999999f;
     private const int MAX_POINTS_COUNT = 10;
 
-    private List<Transform> allObjects = new List<Transform>();
     private List<GraphPoint> graphPoints = new List<GraphPoint>();
 
     private List<GraphPoint> selectedPoints = new List<GraphPoint>();
     private LineRenderer lineRenderer;
 
-    private int edgeCount = 0;
-
+    //Все ребра графа
     public List<Edge> edges = new List<Edge>();
 
     private float[,] sizeMatrix = new float[MAX_POINTS_COUNT, MAX_POINTS_COUNT];
-
+    //Длины кратчайших путей от текущей точки до всех остальных
     private float[] d = new float[MAX_POINTS_COUNT];
-
-    //список посещенных вершин
+    /// <summary>
+    /// Список посещенных вершин
+    /// </summary>
     private List<int> passed = new List<int>();
-    //список оставшихся вершин
-    private List<int> path = new List<int>();
-
-    private int[] p = new int[20];
+    //Координаты точек искомого пути
+    private Vector3[] path = new Vector3[MAX_POINTS_COUNT];
+    //Кратчайший путь. В i-ом элементе содержится номер вершины, из которой пришли в текущую
+    private int[] foundedPoints = new int[MAX_POINTS_COUNT];
 
     public void FindPath()
     {
-        selectedPoints.Clear();
-
-        foreach (GameObject item in Selection.objects)
-        {
-            selectedPoints.Add(item.GetComponent<GraphPoint>());
-        }
-        if (selectedPoints.Count != 2)
-        {
-            Debug.LogError("Graph editor: Выбери две вершины!");
-        }
-        else
+        if (CheckSelection())
         {
             GraphPoint pointA = selectedPoints[0];
             GraphPoint pointB = selectedPoints[1];
-            //TODO: поиск кратчайшего пути
+
             passed.Clear();
 
             for (int i = 0; i <= GraphPoint.count; i++)
@@ -60,8 +49,6 @@ public class Graph : MonoBehaviour
             int curPoint = pointA.Id;
             //Конец пути
             int endPoint = pointB.Id;
-
-            Debug.Log("C=" + curPoint+ "  E=" + endPoint);
 
             for (int i = 0; i < GraphPoint.count; i++)
             {
@@ -77,32 +64,21 @@ public class Graph : MonoBehaviour
                     else
                         d[i] = INF;
                 }
-                p[i] = 0;
+                foundedPoints[i] = 0;
             }
 
             float min = INF;
             int minC = curPoint;
             passed.Add(curPoint);
-            path.Clear();
 
-            Debug.Log("C=" + curPoint);
-
-            string str = "";
-            for (int i = 0; i < p.Length; i++)
+            for (int i = 0; i < foundedPoints.Length; i++)
             {
-                p[i] = curPoint;
+                foundedPoints[i] = curPoint;
             }
 
             while (passed.Count < GraphPoint.count)
             {
-                str = "";
-                for (int i = 1; i <= GraphPoint.count; i++)
-                {
-                    str += d[i].ToString() + "   ";
-                }
-                Debug.Log(str);
                 min = INF;
-
                 for (int i = 1; i <= GraphPoint.count; i++)
                 {
                     if (!passed.Contains(i))
@@ -116,7 +92,7 @@ public class Graph : MonoBehaviour
                 }
                 if (passed.Count == 1)
                 {
-                    p[minC] = curPoint;
+                    foundedPoints[minC] = curPoint;
                 }
                 curPoint = minC;
                 passed.Add(curPoint);
@@ -128,62 +104,45 @@ public class Graph : MonoBehaviour
                         if (d[i] > length)
                         {
                             d[i] = length;
-                            p[i] = curPoint;
+                            foundedPoints[i] = curPoint;
                         }
                     }
                 }
-                Debug.Log("Вершина и путь до нее" + curPoint + " " + d[curPoint]);
+                Debug.Log("GraphEditor: Вершина и путь до нее" + curPoint + " " + d[curPoint]);
             }
-            str = "";
-            for (int i = 1; i <= GraphPoint.count; i++)
-            {
-                str += d[i].ToString() + "   ";
-            }
-            Debug.Log(str);
 
             curPoint = pointA.Id;
-            int k = pointB.Id;
+            int wayPoint = pointB.Id;
             int h = 0;
             graphPoints.AddRange(FindObjectsOfType<GraphPoint>());
             lineRenderer = GetComponent<LineRenderer>();
             lineRenderer.positionCount = 0;
-            while (k != curPoint && h < GraphPoint.count)
+            bool isEnd = false;
+            while (!isEnd && h < GraphPoint.count)
             {
-                Debug.LogError("Path: " + k);
-                foreach (var item in graphPoints)
+                foreach (var graphPoint in graphPoints)
                 {
-                    if (item.Id == k)
+                    if (graphPoint.Id == wayPoint)
                     {
-                        lineRenderer.positionCount++;
-                        lineRenderer.SetPosition(lineRenderer.positionCount - 1, item.Position);
+                        path[wayPoint] = graphPoint.Position;
                     }
                 }
-
-                k = p[k];
-
-
-                h++;
-            }
-            Debug.LogError("Path: " + k);
-            foreach (var item in graphPoints)
-            {
-                if (item.Id == k)
+                lineRenderer.positionCount++;
+                lineRenderer.SetPosition(lineRenderer.positionCount - 1, path[wayPoint]);
+                if (wayPoint == curPoint)
                 {
-                    lineRenderer.positionCount++;
-                    lineRenderer.SetPosition(lineRenderer.positionCount - 1, item.Position);
+                    isEnd = true;
                 }
+
+                wayPoint = foundedPoints[wayPoint];
+                h++;
             }
         }
     }
 
-
     private void Init()
     {
         graphPoints.AddRange(FindObjectsOfType<GraphPoint>());
-        foreach (var item in graphPoints)
-        {
-            allObjects.Add(item.GetComponent<Transform>());
-        }
 
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.positionCount = 0;
@@ -196,7 +155,6 @@ public class Graph : MonoBehaviour
                 sizeMatrix[j, i] = INF;
             }
         }
-
     }
 
     private void OnEnable()
@@ -218,17 +176,7 @@ public class Graph : MonoBehaviour
     /// </summary>
     public void DrawEdge()
     {
-        selectedPoints.Clear();
-
-        foreach (GameObject item in Selection.objects)
-        {
-            selectedPoints.Add(item.GetComponent<GraphPoint>());
-        }
-        if (selectedPoints.Count != 2)
-        {
-            Debug.LogError("Graph editor: Выбери две вершины!");
-        }
-        else
+        if (CheckSelection())
         {
             GraphPoint pointA = selectedPoints[0];
             GraphPoint pointB = selectedPoints[1];
@@ -238,7 +186,7 @@ public class Graph : MonoBehaviour
             if (sizeMatrix[A, B] == INF)
             {
                 Connect(pointA, pointB);
-                Debug.Log(string.Format("Conected {0}, {1}", pointA.Id, pointB.Id));
+                Debug.Log(string.Format("GraphEditor: Conected {0}, {1}", pointA.Id, pointB.Id));
             }
         }
     }
@@ -248,24 +196,13 @@ public class Graph : MonoBehaviour
     /// </summary>
     public void DeleteEdge()
     {
-        selectedPoints.Clear();
-
-        foreach (GameObject item in Selection.objects)
-        {
-            selectedPoints.Add(item.GetComponent<GraphPoint>());
-        }
-
-        if (selectedPoints.Count != 2)
-        {
-            Debug.LogError("Graph editor: Выбери две вершины!");
-        }
-        else
+        if (CheckSelection())
         {
             GraphPoint pointA = selectedPoints[0];
             GraphPoint pointB = selectedPoints[1];
             bool isConnected = sizeMatrix[pointA.Id, pointB.Id] != INF;
 
-            Debug.Log(string.Format("Deleting edge {0}, {1}...", pointA.Id, pointB.Id));
+            Debug.Log(string.Format("GraphEditor: Deleting edge {0}, {1}...", pointA.Id, pointB.Id));
 
             if (isConnected)
             {
@@ -297,39 +234,7 @@ public class Graph : MonoBehaviour
 
         edges.Add(edge);
 
-        Debug.Log("Size= " + edge.Size);
         Update();
-        PrintMatrix();
-    }
-
-
-    private void PrintMatrix()
-    {
-        string str = "   ";
-        for (int i = 0; i < MAX_POINTS_COUNT; i++)
-        {
-            str += i + "   ";
-        }
-        Debug.LogWarning(str);
-        str = "";
-
-        for (int i = 0; i < MAX_POINTS_COUNT; i++)
-        {
-            for (int j = 0; j < MAX_POINTS_COUNT; j++)
-            {
-                if (sizeMatrix[i, j] == INF)
-                {
-                    str += "∞";
-                }
-                else
-                {
-                    str += sizeMatrix[i, j];
-                }                
-                str += "  ";
-            }
-            Debug.LogWarning(i.ToString() +"| " + str);
-            str = "";
-        }
     }
 
     /// <summary>
@@ -346,5 +251,27 @@ public class Graph : MonoBehaviour
                 sizeMatrix[j, i] = INF;
             }
         }
+    }
+
+    public void ClearPath()
+    {
+        lineRenderer.positionCount = 0;
+    }
+
+    private bool CheckSelection()
+    {
+        selectedPoints.Clear();
+
+        foreach (GameObject item in Selection.objects)
+        {
+            selectedPoints.Add(item.GetComponent<GraphPoint>());
+        }
+
+        if (selectedPoints.Count != 2)
+        {
+            Debug.LogError("Graph editor: Выбери две вершины!");
+        }
+
+        return selectedPoints.Count == 2;
     }
 }

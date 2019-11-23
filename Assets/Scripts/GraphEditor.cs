@@ -35,6 +35,11 @@ public class GraphEditor : EditorWindow
         {
             FindObjectOfType<Graph>().FindPath();
         }
+
+        if (GUILayout.Button("Clear path"))
+        {
+            FindObjectOfType<Graph>().ClearPath();
+        }
     }
 
 }
