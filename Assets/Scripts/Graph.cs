@@ -310,6 +310,7 @@ public class Graph : MonoBehaviour
             for (int j = 0; i < 50; i++)
             {
                 matrix[i, j] = 0;
+                sizeMatrix[i, j] = 0;
             }
         }
     }
