@@ -1,4 +1,15 @@
-﻿using System.Collections.Generic;
+﻿/*
+ Неисправленные баги и проблемы:
+ - При переносе точки, построенный путь не обновляется.
+ - Нет решения с размерностью массивов для хранения информации о графе.
+ - Нет решения с максимальным количеством вершин.
+ - Не реализовано сохранение информации о графе.
+ - Не реализовано сохранение настроек редактора.
+ - Не реализован вывод сообщений в окно редактора.
+ */
+
+
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
@@ -13,7 +24,7 @@ public class Graph : MonoBehaviour
     /// Максимальное количество вершин графа
     /// </summary>
     private const int MAX_POINTS_COUNT = 10;
-
+    
     private List<GraphPoint> graphPoints = new List<GraphPoint>();
     private List<GraphPoint> selectedPoints = new List<GraphPoint>();
 
@@ -121,6 +132,8 @@ public class Graph : MonoBehaviour
             int h = 0;
             lineRenderer = GetComponent<LineRenderer>();
             lineRenderer.positionCount = 0;
+            lineRenderer.startColor = GraphEditor.PathColor;
+            lineRenderer.endColor = GraphEditor.PathColor;
             bool isEnd = false;
             while (!isEnd && h < MAX_POINTS_COUNT)
             {
@@ -148,7 +161,19 @@ public class Graph : MonoBehaviour
     {
         if (graphPoints.Contains(point)) return;
         graphPoints.Add(point);
-        Debug.Log("AddPoint");
+        GDebug.Log("Точка " + point.Id + " создана");
+        if (GraphPoint.Count == MAX_POINTS_COUNT - 1)
+        {
+            GDebug.LogWarning("количество точек на сцене достигло максимума!");
+        }
+        else
+        {
+            if (GraphPoint.Count == MAX_POINTS_COUNT)
+            {
+                GDebug.LogError("количество точек на сцене достигло максимума! Лишняя точка удалена.");
+                DestroyImmediate(point.gameObject);
+            }
+        }
     }
 
     private void OnDestroyPoint(GraphPoint point)
@@ -161,7 +186,7 @@ public class Graph : MonoBehaviour
             sizeMatrix[point.Id, i] = INF;
         }
         FindAndDeleteEdge(point);
-        Debug.Log("DeletePoint");
+        GDebug.Log("Точка "+ point.Id+" удалена");
     }
 
     private void FindAndDeleteEdge(GraphPoint point)
@@ -210,7 +235,7 @@ public class Graph : MonoBehaviour
         {
             if (edges[i].pointA != null && edges[i].pointB != null)
             {
-                Debug.DrawLine(edges[i].pointA.Position, edges[i].pointB.Position);
+                Debug.DrawLine(edges[i].pointA.Position, edges[i].pointB.Position,GraphEditor.EdgeColor);
             }
         }
     }
@@ -230,7 +255,7 @@ public class Graph : MonoBehaviour
             if (sizeMatrix[A, B] == INF)
             {
                 Connect(pointA, pointB);
-                Debug.Log(string.Format("GraphEditor: Conected {0}, {1}", pointA.Id, pointB.Id));
+                GDebug.Log(string.Format("соединены {0}, {1}", pointA.Id, pointB.Id));
             }
         }
     }
@@ -246,7 +271,7 @@ public class Graph : MonoBehaviour
             GraphPoint pointB = selectedPoints[1];
             bool isConnected = sizeMatrix[pointA.Id, pointB.Id] != INF;
 
-            Debug.Log(string.Format("GraphEditor: Deleting edge {0}, {1}...", pointA.Id, pointB.Id));
+            GDebug.Log(string.Format("удаление ребра {0}, {1}...", pointA.Id, pointB.Id));
 
             if (isConnected)
             {
@@ -313,7 +338,7 @@ public class Graph : MonoBehaviour
 
         if (selectedPoints.Count != 2)
         {
-            Debug.LogError("Graph editor: Выбери две вершины!");
+            GDebug.LogError("Выбери две вершины!");
         }
 
         return selectedPoints.Count == 2;

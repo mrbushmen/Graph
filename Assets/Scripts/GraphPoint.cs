@@ -33,7 +33,8 @@ public class GraphPoint : MonoBehaviour
     /// Идентификатор (номер, имя) точки. Присваивается при создании/включении объекта
     /// со скриптом GraphPoint.
     /// </summary>
-    public int Id { get; private set; } = 0;
+    //public int Id { get; private set; } = 0;
+    public int Id  = 0;
 
     private void OnEnable()
     {
@@ -46,6 +47,7 @@ public class GraphPoint : MonoBehaviour
             }
         }
         usedId.Add(Id);
+        color = GraphEditor.PointColor;
         CreatePointsHandler?.Invoke(this);
     }
 
@@ -64,7 +66,7 @@ public class GraphPoint : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.red;
+        Gizmos.color = GraphEditor.SelectedPointColor;
         Gizmos.DrawSphere(transform.position, 0.7f);
     }
 }
