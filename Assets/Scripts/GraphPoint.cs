@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 /// <summary>
 /// Вершина графа
@@ -6,7 +8,15 @@
 [ExecuteInEditMode]
 public class GraphPoint : MonoBehaviour
 {
-    public static int count = 0;
+    public static Action<GraphPoint> DestroyPointsHandler;
+    public static Action<GraphPoint> CreatePointsHandler;
+
+    /// <summary>
+    /// Количество точек на сцене.
+    /// </summary>
+    public static int Count { get; private set; } = 0;
+
+    private static List<int> usedId = new List<int>();
 
     [SerializeField]
     private Color32 color = new Color32(0, 255, 150, 255);
@@ -19,19 +29,33 @@ public class GraphPoint : MonoBehaviour
         get => transform.position;
     }
 
-    //TODO: после отладки заменить поле свойством
+    /// <summary>
+    /// Идентификатор (номер, имя) точки. Присваивается при создании/включении объекта
+    /// со скриптом GraphPoint.
+    /// </summary>
     //public int Id { get; private set; } = 0;
-    public int Id = 0;
+    public int Id  = 0;
 
     private void OnEnable()
     {
-        count++;
-        Id = count;
+        Count++;
+        for (int i = 1; i <= Count; i++)
+        {
+            if (!usedId.Contains(i))
+            {
+                Id = i;
+            }
+        }
+        usedId.Add(Id);
+        color = GraphEditor.PointColor;
+        CreatePointsHandler?.Invoke(this);
     }
 
     private void OnDisable()
     {
-        count--;
+        Count--;
+        usedId.Remove(Id);
+        DestroyPointsHandler?.Invoke(this);
     }
 
     private void OnDrawGizmos()
@@ -42,7 +66,7 @@ public class GraphPoint : MonoBehaviour
 
     private void OnDrawGizmosSelected()
     {
-        Gizmos.color = Color.red;
+        Gizmos.color = GraphEditor.SelectedPointColor;
         Gizmos.DrawSphere(transform.position, 0.7f);
     }
 }
