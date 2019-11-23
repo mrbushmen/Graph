@@ -8,6 +8,9 @@ using UnityEditor;
 [ExecuteInEditMode]
 public class Graph : MonoBehaviour
 {
+    private const float INF = 999999f;
+    private const int MAX_POINTS_COUNT = 10;
+
     private List<Transform> allObjects = new List<Transform>();
     private List<GraphPoint> graphPoints = new List<GraphPoint>();
 
@@ -16,12 +19,11 @@ public class Graph : MonoBehaviour
 
     private int edgeCount = 0;
 
-    public List<Edge> connectedPoints = new List<Edge>();
+    public List<Edge> edges = new List<Edge>();
 
-    private int[,] matrix = new int[50, 50];
-    private float[,] sizeMatrix = new float[50, 50];
+    private float[,] sizeMatrix = new float[MAX_POINTS_COUNT, MAX_POINTS_COUNT];
 
-    private float[] d = new float[20];
+    private float[] d = new float[MAX_POINTS_COUNT];
 
     //список посещенных вершин
     private List<int> passed = new List<int>();
@@ -49,44 +51,46 @@ public class Graph : MonoBehaviour
             //TODO: поиск кратчайшего пути
             passed.Clear();
 
-            for (int i = 0; i < GraphPoint.count; i++)
+            for (int i = 0; i <= GraphPoint.count; i++)
             {
-                d[i] = 99999f;
+                d[i] = INF;
             }
 
             //Начало пути
-            int c = pointA.Id;
+            int curPoint = pointA.Id;
             //Конец пути
-            int e = pointB.Id;
+            int endPoint = pointB.Id;
+
+            Debug.Log("C=" + curPoint+ "  E=" + endPoint);
 
             for (int i = 0; i < GraphPoint.count; i++)
             {
                 //Если между вершинами есть ребро, заносим его длину в массив
-                if (matrix[c, i] == 1)
+                if (sizeMatrix[curPoint, i] != 0 && sizeMatrix[curPoint, i] != INF)
                 {
-                    d[i] = sizeMatrix[c, i];
+                    d[i] = sizeMatrix[curPoint, i];
                 }
                 else
                 {
-                    if (c == i)
+                    if (curPoint == i)
                         d[i] = 0;
                     else
-                        d[i] = 99999f;
+                        d[i] = INF;
                 }
                 p[i] = 0;
             }
 
-            float min = 99999f;
-            int minC = c;
-            passed.Add(c);
+            float min = INF;
+            int minC = curPoint;
+            passed.Add(curPoint);
             path.Clear();
 
-            Debug.LogError("C=" + c);
+            Debug.Log("C=" + curPoint);
 
             string str = "";
             for (int i = 0; i < p.Length; i++)
             {
-                p[i] = c;
+                p[i] = curPoint;
             }
 
             while (passed.Count < GraphPoint.count)
@@ -97,7 +101,8 @@ public class Graph : MonoBehaviour
                     str += d[i].ToString() + "   ";
                 }
                 Debug.Log(str);
-                min = 99999f;
+                min = INF;
+
                 for (int i = 1; i <= GraphPoint.count; i++)
                 {
                     if (!passed.Contains(i))
@@ -111,23 +116,23 @@ public class Graph : MonoBehaviour
                 }
                 if (passed.Count == 1)
                 {
-                    p[minC] = c;
+                    p[minC] = curPoint;
                 }
-                c = minC;
-                passed.Add(c);
+                curPoint = minC;
+                passed.Add(curPoint);
                 for (int i = 1; i <= GraphPoint.count; i++)
                 {
-                    if (!passed.Contains(i) && sizeMatrix[i, c] != 0f)
+                    if (!passed.Contains(i) && sizeMatrix[i, curPoint] != 0f)
                     {
-                        float length = d[c] + sizeMatrix[i, c];
+                        float length = d[curPoint] + sizeMatrix[i, curPoint];
                         if (d[i] > length)
                         {
                             d[i] = length;
-                            p[i] = c;
+                            p[i] = curPoint;
                         }
                     }
                 }
-                Debug.Log("Вершина и путь до нее" + c + " " + d[c]);
+                Debug.Log("Вершина и путь до нее" + curPoint + " " + d[curPoint]);
             }
             str = "";
             for (int i = 1; i <= GraphPoint.count; i++)
@@ -136,13 +141,13 @@ public class Graph : MonoBehaviour
             }
             Debug.Log(str);
 
-            c = pointA.Id;
+            curPoint = pointA.Id;
             int k = pointB.Id;
             int h = 0;
             graphPoints.AddRange(FindObjectsOfType<GraphPoint>());
             lineRenderer = GetComponent<LineRenderer>();
             lineRenderer.positionCount = 0;
-            while (k != c && h < GraphPoint.count)
+            while (k != curPoint && h < GraphPoint.count)
             {
                 Debug.LogError("Path: " + k);
                 foreach (var item in graphPoints)
@@ -181,12 +186,14 @@ public class Graph : MonoBehaviour
         }
 
         lineRenderer = GetComponent<LineRenderer>();
+        lineRenderer.positionCount = 0;
 
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < MAX_POINTS_COUNT; i++)
         {
-            for (int j = 0; j < 50; j++)
+            for (int j = 0; j < MAX_POINTS_COUNT; j++)
             {
-                sizeMatrix[i, j] = 99999f;
+                sizeMatrix[i, j] = INF;
+                sizeMatrix[j, i] = INF;
             }
         }
 
@@ -194,14 +201,15 @@ public class Graph : MonoBehaviour
 
     private void OnEnable()
     {
+        Init();
         DeleteAllEdges();
     }
 
     private void Update()
     {
-        for (int i = 0; i < connectedPoints.Count; i++)
+        for (int i = 0; i < edges.Count; i++)
         {
-            Debug.DrawLine(connectedPoints[i].pointA.Position, connectedPoints[i].pointB.Position);
+            Debug.DrawLine(edges[i].pointA.Position, edges[i].pointB.Position);
         }
     }
 
@@ -227,7 +235,7 @@ public class Graph : MonoBehaviour
             int A = pointA.Id;
             int B = pointB.Id;
 
-            if (matrix[A, B] != 1)
+            if (sizeMatrix[A, B] == INF)
             {
                 Connect(pointA, pointB);
                 Debug.Log(string.Format("Conected {0}, {1}", pointA.Id, pointB.Id));
@@ -255,7 +263,7 @@ public class Graph : MonoBehaviour
         {
             GraphPoint pointA = selectedPoints[0];
             GraphPoint pointB = selectedPoints[1];
-            bool isConnected = matrix[pointA.Id, pointB.Id] == 1;
+            bool isConnected = sizeMatrix[pointA.Id, pointB.Id] != INF;
 
             Debug.Log(string.Format("Deleting edge {0}, {1}...", pointA.Id, pointB.Id));
 
@@ -267,14 +275,13 @@ public class Graph : MonoBehaviour
     }
     private void Disсonnect(GraphPoint pointA, GraphPoint pointB)
     {
-        for (int i = 0; i < connectedPoints.Count; i++)
+        for (int i = 0; i < edges.Count; i++)
         {
-            if (connectedPoints[i].points.Contains(pointA.Id) && connectedPoints[i].points.Contains(pointB.Id))
+            if (edges[i].points.Contains(pointA.Id) && edges[i].points.Contains(pointB.Id))
             {
-                connectedPoints.Remove(connectedPoints[i]);
-                matrix[pointA.Id, pointB.Id] = 0;
-                matrix[pointB.Id, pointA.Id] = 0;
-                edgeCount--;
+                edges.Remove(edges[i]);
+                sizeMatrix[pointA.Id, pointB.Id] = INF;
+                sizeMatrix[pointB.Id, pointA.Id] = INF;
                 Update();
                 break;
             }
@@ -283,19 +290,46 @@ public class Graph : MonoBehaviour
 
     private void Connect(GraphPoint pointA, GraphPoint pointB)
     {
-        matrix[pointA.Id, pointB.Id] = 1;
-        matrix[pointB.Id, pointA.Id] = 1;
-        edgeCount++;
-
         var edge = new Edge(pointA, pointB);
-        connectedPoints.Add(edge);
 
         sizeMatrix[pointA.Id, pointB.Id] = edge.Size;
         sizeMatrix[pointB.Id, pointA.Id] = edge.Size;
 
-        Debug.Log("Size= " + edge.Size);
+        edges.Add(edge);
 
+        Debug.Log("Size= " + edge.Size);
         Update();
+        PrintMatrix();
+    }
+
+
+    private void PrintMatrix()
+    {
+        string str = "   ";
+        for (int i = 0; i < MAX_POINTS_COUNT; i++)
+        {
+            str += i + "   ";
+        }
+        Debug.LogWarning(str);
+        str = "";
+
+        for (int i = 0; i < MAX_POINTS_COUNT; i++)
+        {
+            for (int j = 0; j < MAX_POINTS_COUNT; j++)
+            {
+                if (sizeMatrix[i, j] == INF)
+                {
+                    str += "∞";
+                }
+                else
+                {
+                    str += sizeMatrix[i, j];
+                }                
+                str += "  ";
+            }
+            Debug.LogWarning(i.ToString() +"| " + str);
+            str = "";
+        }
     }
 
     /// <summary>
@@ -303,17 +337,14 @@ public class Graph : MonoBehaviour
     /// </summary>
     public void DeleteAllEdges()
     {
-        edgeCount = 0;
-        connectedPoints.Clear();
-        for (int i = 0; i < 50; i++)
+        edges.Clear();
+        for (int i = 0; i < MAX_POINTS_COUNT; i++)
         {
-            for (int j = 0; i < 50; i++)
+            for (int j = 0; i < MAX_POINTS_COUNT; i++)
             {
-                matrix[i, j] = 0;
-                sizeMatrix[i, j] = 0;
+                sizeMatrix[i, j] = INF;
+                sizeMatrix[j, i] = INF;
             }
         }
     }
-
-
 }
