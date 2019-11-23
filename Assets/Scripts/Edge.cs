@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System;
 
 /// <summary>
 /// Ребро графа
@@ -11,12 +12,23 @@ public class Edge
     public GraphPoint pointA;
     public GraphPoint pointB;
 
+    public float Size
+    {
+        //TODO: переписать?
+        get => (float) Math.Round( UnityEngine.Vector3.Distance(pointA.Position, pointB.Position),1);
+    }
+
     public Edge(GraphPoint a, GraphPoint b)
     {
         pointA = a;
         pointB = b;
         points.Add(a.Id);
         points.Add(b.Id);
+    }
+
+    public bool HasPoint(GraphPoint point)
+    {
+        return (pointA == point || pointB == point);
     }
 
     public static bool operator ==(Edge one, Edge two)

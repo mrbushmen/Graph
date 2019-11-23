@@ -6,7 +6,7 @@
 [ExecuteInEditMode]
 public class GraphPoint : MonoBehaviour
 {
-    private static int count = 0;
+    public static int count = 0;
 
     [SerializeField]
     private Color32 color = new Color32(0, 255, 150, 255);

@@ -30,6 +30,11 @@ public class GraphEditor : EditorWindow
         {
             FindObjectOfType<Graph>().DeleteAllEdges();
         }
+
+        if (GUILayout.Button("Find path"))
+        {
+            FindObjectOfType<Graph>().FindPath();
+        }
     }
 
 }
