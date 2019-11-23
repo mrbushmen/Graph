@@ -9,17 +9,21 @@ using UnityEditor;
 public class Graph : MonoBehaviour
 {
     private const float INF = 999999f;
+    /// <summary>
+    /// Максимальное количество вершин графа
+    /// </summary>
     private const int MAX_POINTS_COUNT = 10;
 
     private List<GraphPoint> graphPoints = new List<GraphPoint>();
-
     private List<GraphPoint> selectedPoints = new List<GraphPoint>();
-    private LineRenderer lineRenderer;
 
-    //Все ребра графа
-    public List<Edge> edges = new List<Edge>();
+    /// <summary>
+    /// Все ребра графа
+    /// </summary>
+    private List<Edge> edges = new List<Edge>();
 
     private float[,] sizeMatrix = new float[MAX_POINTS_COUNT, MAX_POINTS_COUNT];
+
     //Длины кратчайших путей от текущей точки до всех остальных
     private float[] d = new float[MAX_POINTS_COUNT];
     /// <summary>
@@ -28,8 +32,10 @@ public class Graph : MonoBehaviour
     private List<int> passed = new List<int>();
     //Координаты точек искомого пути
     private Vector3[] path = new Vector3[MAX_POINTS_COUNT];
-    //Кратчайший путь. В i-ом элементе содержится номер вершины, из которой пришли в текущую
+    //Кратчайший путь. В i-ом элементе содержится номер вершины, из которой пришли в вершину с номером i
     private int[] foundedPoints = new int[MAX_POINTS_COUNT];
+
+    private LineRenderer lineRenderer;
 
     public void FindPath()
     {
@@ -40,7 +46,7 @@ public class Graph : MonoBehaviour
 
             passed.Clear();
 
-            for (int i = 0; i <= GraphPoint.count; i++)
+            for (int i = 0; i <= GraphPoint.Count; i++)
             {
                 d[i] = INF;
             }
@@ -50,7 +56,7 @@ public class Graph : MonoBehaviour
             //Конец пути
             int endPoint = pointB.Id;
 
-            for (int i = 0; i < GraphPoint.count; i++)
+            for (int i = 0; i < GraphPoint.Count; i++)
             {
                 //Если между вершинами есть ребро, заносим его длину в массив
                 if (sizeMatrix[curPoint, i] != 0 && sizeMatrix[curPoint, i] != INF)
@@ -76,10 +82,10 @@ public class Graph : MonoBehaviour
                 foundedPoints[i] = curPoint;
             }
 
-            while (passed.Count < GraphPoint.count)
+            while (passed.Count < GraphPoint.Count)
             {
                 min = INF;
-                for (int i = 1; i <= GraphPoint.count; i++)
+                for (int i = 1; i <= GraphPoint.Count; i++)
                 {
                     if (!passed.Contains(i))
                     {
@@ -96,7 +102,7 @@ public class Graph : MonoBehaviour
                 }
                 curPoint = minC;
                 passed.Add(curPoint);
-                for (int i = 1; i <= GraphPoint.count; i++)
+                for (int i = 1; i <= GraphPoint.Count; i++)
                 {
                     if (!passed.Contains(i) && sizeMatrix[i, curPoint] != 0f)
                     {
@@ -114,11 +120,10 @@ public class Graph : MonoBehaviour
             curPoint = pointA.Id;
             int wayPoint = pointB.Id;
             int h = 0;
-            graphPoints.AddRange(FindObjectsOfType<GraphPoint>());
             lineRenderer = GetComponent<LineRenderer>();
             lineRenderer.positionCount = 0;
             bool isEnd = false;
-            while (!isEnd && h < GraphPoint.count)
+            while (!isEnd && h < GraphPoint.Count)
             {
                 foreach (var graphPoint in graphPoints)
                 {
@@ -140,9 +145,46 @@ public class Graph : MonoBehaviour
         }
     }
 
+    private void OnCreatePoint(GraphPoint point)
+    {
+        if (graphPoints.Contains(point)) return;
+        graphPoints.Add(point);
+        Debug.Log("AddPoint");
+    }
+
+    private void OnDestroyPoint(GraphPoint point)
+    {
+        graphPoints.Remove(point);
+
+        for (int i = 0; i < MAX_POINTS_COUNT; i++)
+        {
+            sizeMatrix[i, point.Id] = INF;
+            sizeMatrix[point.Id, i] = INF;
+        }
+        FindAndDeleteEdge(point);
+        Debug.Log("DeletePoint");
+    }
+
+    private void FindAndDeleteEdge(GraphPoint point)
+    {
+        foreach (var edge in edges)
+        {
+            if (edge.points.Contains(point.Id))
+            {
+                edges.Remove(edge);
+                FindAndDeleteEdge(point);
+                break;
+            }
+        }
+    }
+
     private void Init()
     {
+        graphPoints.Clear();
         graphPoints.AddRange(FindObjectsOfType<GraphPoint>());
+
+        GraphPoint.DestroyPointsHandler += OnDestroyPoint;
+        GraphPoint.CreatePointsHandler += OnCreatePoint;
 
         lineRenderer = GetComponent<LineRenderer>();
         lineRenderer.positionCount = 0;
@@ -167,7 +209,10 @@ public class Graph : MonoBehaviour
     {
         for (int i = 0; i < edges.Count; i++)
         {
-            Debug.DrawLine(edges[i].pointA.Position, edges[i].pointB.Position);
+            if (edges[i].pointA != null && edges[i].pointB != null)
+            {
+                Debug.DrawLine(edges[i].pointA.Position, edges[i].pointB.Position);
+            }
         }
     }
 
