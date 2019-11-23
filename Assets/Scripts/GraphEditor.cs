@@ -6,6 +6,19 @@ using UnityEditor;
 /// </summary>
 public class GraphEditor : EditorWindow
 {
+    private Graph graph;
+    private Graph Graph
+    {
+        get
+        {
+            if (graph == null)
+            {
+                graph = FindObjectOfType<Graph>();
+            }
+            return graph;
+        }
+    }
+
     [MenuItem("Window/Graph editor")]
     public static void ShowWindow()
     {
@@ -18,27 +31,27 @@ public class GraphEditor : EditorWindow
 
         if (GUILayout.Button("Draw edge"))
         {
-            FindObjectOfType<Graph>().DrawEdge();
+            Graph.DrawEdge();
         }
 
         if (GUILayout.Button("Delete edge"))
-        {            
-            FindObjectOfType<Graph>().DeleteEdge();
+        {
+            Graph.DeleteEdge();
         }
 
         if (GUILayout.Button("Delete all edges"))
         {
-            FindObjectOfType<Graph>().DeleteAllEdges();
+            Graph.DeleteAllEdges();
         }
 
         if (GUILayout.Button("Find path"))
         {
-            FindObjectOfType<Graph>().FindPath();
+            Graph.FindPath();
         }
 
         if (GUILayout.Button("Clear path"))
         {
-            FindObjectOfType<Graph>().ClearPath();
+            Graph.ClearPath();
         }
     }
 
