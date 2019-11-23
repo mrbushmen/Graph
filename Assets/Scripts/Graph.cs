@@ -49,6 +49,9 @@ public class Graph : MonoBehaviour
 
     private LineRenderer lineRenderer;
 
+    [SerializeField]
+    private GraphData graphData;
+
     public void FindPath()
     {
         if (CheckSelection())
@@ -343,5 +346,10 @@ public class Graph : MonoBehaviour
         }
 
         return selectedPoints.Count == 2;
+    }
+
+    public void Save()
+    {
+
     }
 }

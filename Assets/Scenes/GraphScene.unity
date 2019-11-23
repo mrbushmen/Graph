@@ -202,16 +202,7 @@ LineRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Positions:
-  - {x: -2.2300005, y: 6.28, z: 0}
-  - {x: 3.37, y: 3.35, z: 0}
-  - {x: 5.15, y: 7.97, z: 0}
-  - {x: 1.7, y: 11.38, z: 0}
-  - {x: 2.68, y: 17.6, z: 0}
-  - {x: 15.53, y: 15.68, z: 0}
-  - {x: 15.99, y: 6.11, z: 0}
-  - {x: 11.96, y: -0.38, z: 0}
-  - {x: -4.66, y: 2.91, z: 0}
+  m_Positions: []
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.2
@@ -299,7 +290,7 @@ MonoBehaviour:
   color:
     serializedVersion: 2
     rgba: 4278255360
-  Id: 6
+  Id: 9
 --- !u!4 &106746684
 Transform:
   m_ObjectHideFlags: 0
@@ -346,7 +337,7 @@ MonoBehaviour:
   color:
     serializedVersion: 2
     rgba: 4278255360
-  Id: 9
+  Id: 3
 --- !u!4 &497856690
 Transform:
   m_ObjectHideFlags: 0
@@ -393,7 +384,7 @@ MonoBehaviour:
   color:
     serializedVersion: 2
     rgba: 4278255360
-  Id: 4
+  Id: 6
 --- !u!4 &686275432
 Transform:
   m_ObjectHideFlags: 0
@@ -440,7 +431,7 @@ MonoBehaviour:
   color:
     serializedVersion: 2
     rgba: 4278255360
-  Id: 3
+  Id: 2
 --- !u!4 &692707970
 Transform:
   m_ObjectHideFlags: 0
@@ -487,7 +478,7 @@ MonoBehaviour:
   color:
     serializedVersion: 2
     rgba: 4278255360
-  Id: 1
+  Id: 5
 --- !u!4 &777383887
 Transform:
   m_ObjectHideFlags: 0
@@ -681,7 +672,7 @@ MonoBehaviour:
   color:
     serializedVersion: 2
     rgba: 4278255360
-  Id: 5
+  Id: 1
 --- !u!4 &1488053649
 Transform:
   m_ObjectHideFlags: 0
@@ -728,7 +719,7 @@ MonoBehaviour:
   color:
     serializedVersion: 2
     rgba: 4278255360
-  Id: 7
+  Id: 4
 --- !u!4 &1494160877
 Transform:
   m_ObjectHideFlags: 0
@@ -775,7 +766,7 @@ MonoBehaviour:
   color:
     serializedVersion: 2
     rgba: 4278255360
-  Id: 2
+  Id: 7
 --- !u!4 &1990720207
 Transform:
   m_ObjectHideFlags: 0

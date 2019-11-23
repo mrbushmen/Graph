@@ -70,6 +70,11 @@ public class GraphEditor : EditorWindow
             Graph.ClearPath();
         }
 
+        if (GUILayout.Button("Сохранить граф"))
+        {
+            Graph.Save();
+        }
+
         GUILayout.Label("Настройки", headStyle);
         PointColor = EditorGUILayout.ColorField("Цвет вершины", PointColor);
         SelectedPointColor = EditorGUILayout.ColorField("Цвет выбранной вершины", SelectedPointColor);
