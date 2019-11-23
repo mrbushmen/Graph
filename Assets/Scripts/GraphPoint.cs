@@ -15,11 +15,8 @@ public class GraphPoint : MonoBehaviour
     /// Количество точек на сцене.
     /// </summary>
     public static int Count { get; private set; } = 0;
-    //Максимальный номер точки, находящейся на сцене
-    public static int MaxId { get; private set; } = 0;
 
     private static List<int> usedId = new List<int>();
-
 
     [SerializeField]
     private Color32 color = new Color32(0, 255, 150, 255);
@@ -31,7 +28,11 @@ public class GraphPoint : MonoBehaviour
     {
         get => transform.position;
     }
-   
+
+    /// <summary>
+    /// Идентификатор (номер, имя) точки. Присваивается при создании/включении объекта
+    /// со скриптом GraphPoint.
+    /// </summary>
     public int Id { get; private set; } = 0;
 
     private void OnEnable()
@@ -42,12 +43,7 @@ public class GraphPoint : MonoBehaviour
             if (!usedId.Contains(i))
             {
                 Id = i;
-                
             }
-        }
-        if (MaxId < Id)
-        {
-            MaxId = Id;
         }
         usedId.Add(Id);
         CreatePointsHandler?.Invoke(this);

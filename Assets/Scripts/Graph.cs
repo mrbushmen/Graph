@@ -22,18 +22,18 @@ public class Graph : MonoBehaviour
     /// </summary>
     private List<Edge> edges = new List<Edge>();
 
-    private float[,] sizeMatrix = new float[MAX_POINTS_COUNT, MAX_POINTS_COUNT];
+    private float[,] sizeMatrix = new float[MAX_POINTS_COUNT+1, MAX_POINTS_COUNT + 1];
 
     //Длины кратчайших путей от текущей точки до всех остальных
-    private float[] d = new float[MAX_POINTS_COUNT];
+    private float[] d = new float[MAX_POINTS_COUNT + 1];
     /// <summary>
     /// Список посещенных вершин
     /// </summary>
     private List<int> passed = new List<int>();
     //Координаты точек искомого пути
-    private Vector3[] path = new Vector3[MAX_POINTS_COUNT];
+    private Vector3[] path = new Vector3[MAX_POINTS_COUNT + 1];
     //Кратчайший путь. В i-ом элементе содержится номер вершины, из которой пришли в вершину с номером i
-    private int[] foundedPoints = new int[MAX_POINTS_COUNT];
+    private int[] foundedPoints = new int[MAX_POINTS_COUNT + 1];
 
     private LineRenderer lineRenderer;
 
@@ -46,7 +46,7 @@ public class Graph : MonoBehaviour
 
             passed.Clear();
 
-            for (int i = 0; i <= GraphPoint.Count; i++)
+            for (int i = 0; i <= MAX_POINTS_COUNT; i++)
             {
                 d[i] = INF;
             }
@@ -56,7 +56,7 @@ public class Graph : MonoBehaviour
             //Конец пути
             int endPoint = pointB.Id;
 
-            for (int i = 0; i < GraphPoint.Count; i++)
+            for (int i = 0; i <= MAX_POINTS_COUNT; i++)
             {
                 //Если между вершинами есть ребро, заносим его длину в массив
                 if (sizeMatrix[curPoint, i] != 0 && sizeMatrix[curPoint, i] != INF)
@@ -82,10 +82,10 @@ public class Graph : MonoBehaviour
                 foundedPoints[i] = curPoint;
             }
 
-            while (passed.Count < GraphPoint.Count)
+            while (passed.Count < MAX_POINTS_COUNT)
             {
                 min = INF;
-                for (int i = 1; i <= GraphPoint.Count; i++)
+                for (int i = 1; i <= MAX_POINTS_COUNT; i++)
                 {
                     if (!passed.Contains(i))
                     {
@@ -102,7 +102,7 @@ public class Graph : MonoBehaviour
                 }
                 curPoint = minC;
                 passed.Add(curPoint);
-                for (int i = 1; i <= GraphPoint.Count; i++)
+                for (int i = 1; i <= MAX_POINTS_COUNT; i++)
                 {
                     if (!passed.Contains(i) && sizeMatrix[i, curPoint] != 0f)
                     {
@@ -113,8 +113,7 @@ public class Graph : MonoBehaviour
                             foundedPoints[i] = curPoint;
                         }
                     }
-                }
-                Debug.Log("GraphEditor: Вершина и путь до нее" + curPoint + " " + d[curPoint]);
+                }                
             }
 
             curPoint = pointA.Id;
@@ -123,7 +122,7 @@ public class Graph : MonoBehaviour
             lineRenderer = GetComponent<LineRenderer>();
             lineRenderer.positionCount = 0;
             bool isEnd = false;
-            while (!isEnd && h < GraphPoint.Count)
+            while (!isEnd && h < MAX_POINTS_COUNT)
             {
                 foreach (var graphPoint in graphPoints)
                 {
