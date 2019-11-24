@@ -33,8 +33,7 @@ public class GraphPoint : MonoBehaviour
     /// Идентификатор (номер, имя) точки. Присваивается при создании/включении объекта
     /// со скриптом GraphPoint.
     /// </summary>
-    //public int Id { get; private set; } = 0;
-    public int Id  = 0;
+    public int Id { get; private set; } = 0;
 
     private void OnEnable()
     {
