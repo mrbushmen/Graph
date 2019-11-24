@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System;
+using UnityEngine;
 
 /// <summary>
 /// Ребро графа
@@ -9,39 +10,56 @@ public class Edge
 {
     public List<int> points = new List<int>();
 
-    public GraphPoint pointA;
-    public GraphPoint pointB;
+    public Point A;
+    public Point B;
 
+    private float size;
     public float Size
     {
-        //TODO: переписать?
-        get => (float) Math.Round( UnityEngine.Vector3.Distance(pointA.Position, pointB.Position),1);
+        get => size;
     }
 
-    public Edge(GraphPoint a, GraphPoint b)
+    public Edge(Vector3  pointA, Vector3 pointB, int aId, int bId)
     {
-        pointA = a;
-        pointB = b;
-        points.Add(a.Id);
-        points.Add(b.Id);
+        Math.Round(Vector3.Distance(pointA, pointB), 1);
+        A = new Point(pointA);
+        B = new Point(pointB);
+
+        points.Add(aId);
+        points.Add(bId);
     }
 
-    public bool HasPoint(GraphPoint point)
+   
+    public bool HasPoint(int pointId)
     {
-        return (pointA == point || pointB == point);
+        return (points.Contains(pointId));
     }
 
-    public static bool operator ==(Edge one, Edge two)
+    [System.Serializable]
+    public struct Point
     {
-        bool result = (one.pointA == two.pointA) && (one.pointB == two.pointB);
-        result |= (one.pointA == two.pointB) && (one.pointB == two.pointA);
-        return result;
+        public float X;
+        public float Y;
+        public float Z;
+
+        public Point(float x,float y, float z)
+        {
+            X = x;
+            Y = y;
+            Z = z;
+        }
+
+        public Point(Vector3 vector)
+        {
+            X = vector.x;
+            Y = vector.y;
+            Z = vector.z;
+        }
+
+        public Vector3 ToVector()
+        {
+            return new Vector3(X, Y, Z);
+        }
     }
 
-    public static bool operator !=(Edge one, Edge two)
-    {
-        bool result = (one.pointA == two.pointA) && (one.pointB == two.pointB);
-        result |= (one.pointA == two.pointB) && (one.pointB == two.pointA);
-        return !result;
-    }
 }

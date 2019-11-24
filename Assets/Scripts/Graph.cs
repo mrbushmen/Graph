@@ -24,7 +24,7 @@ public class Graph : MonoBehaviour
     /// Максимальное количество вершин графа
     /// </summary>
     public const int MAX_POINTS_COUNT = 10;
-    
+
     private List<GraphPoint> graphPoints = new List<GraphPoint>();
     private List<GraphPoint> selectedPoints = new List<GraphPoint>();
 
@@ -33,7 +33,8 @@ public class Graph : MonoBehaviour
     /// </summary>
     public List<Edge> edges = new List<Edge>();
 
-    public float[,] sizeMatrix = new float[MAX_POINTS_COUNT+1, MAX_POINTS_COUNT + 1];
+    public float[,] sizeMatrix = new float[MAX_POINTS_COUNT + 1, MAX_POINTS_COUNT + 1];
+    public Edge.Point[] points = new Edge.Point[MAX_POINTS_COUNT + 1];
 
     //Длины кратчайших путей от текущей точки до всех остальных
     private float[] d = new float[MAX_POINTS_COUNT + 1];
@@ -124,7 +125,7 @@ public class Graph : MonoBehaviour
                             foundedPoints[i] = curPoint;
                         }
                     }
-                }                
+                }
             }
 
             curPoint = pointA.Id;
@@ -186,7 +187,7 @@ public class Graph : MonoBehaviour
             sizeMatrix[point.Id, i] = INF;
         }
         FindAndDeleteEdge(point);
-        GDebug.Log("Точка "+ point.Id+" удалена");
+        GDebug.Log("Точка " + point.Id + " удалена");
     }
 
     private void FindAndDeleteEdge(GraphPoint point)
@@ -233,9 +234,9 @@ public class Graph : MonoBehaviour
     {
         for (int i = 0; i < edges.Count; i++)
         {
-            if (edges[i].pointA != null && edges[i].pointB != null)
+            if (edges[i].points.Count == 2)
             {
-                Debug.DrawLine(edges[i].pointA.Position, edges[i].pointB.Position,GraphEditor.EdgeColor);
+                Debug.DrawLine(edges[i].A.ToVector(), edges[i].B.ToVector(), GraphEditor.EdgeColor);
             }
         }
     }
@@ -296,7 +297,7 @@ public class Graph : MonoBehaviour
 
     private void Connect(GraphPoint pointA, GraphPoint pointB)
     {
-        var edge = new Edge(pointA, pointB);
+        var edge = new Edge(pointA.Position, pointB.Position, pointA.Id, pointB.Id);
 
         sizeMatrix[pointA.Id, pointB.Id] = edge.Size;
         sizeMatrix[pointB.Id, pointA.Id] = edge.Size;
@@ -346,6 +347,10 @@ public class Graph : MonoBehaviour
 
     public void Save()
     {
+        foreach (var item in graphPoints)
+        {
+            points[item.Id] = item.point;
+        }
         SaveSystem.SaveGraph(this);
     }
 
@@ -355,5 +360,10 @@ public class Graph : MonoBehaviour
 
         sizeMatrix = data.sizeMatrix;
         edges = data.edges;
+
+        foreach (var item in graphPoints)
+        {
+            item.SetPosition(data.points[item.Id]);
+        }
     }
 }

@@ -30,6 +30,11 @@ public class GraphPoint : MonoBehaviour
         get => transform.position;
     }
 
+    public Edge.Point point
+    {
+        get => new Edge.Point (transform.position);
+    }
+
     /// <summary>
     /// Идентификатор (номер, имя) точки. Присваивается при создании/включении объекта
     /// со скриптом GraphPoint.
@@ -69,5 +74,14 @@ public class GraphPoint : MonoBehaviour
     {
         Gizmos.color = GraphEditor.SelectedPointColor;
         Gizmos.DrawSphere(transform.position, 0.7f);
+    }
+
+    public void SetPosition(Vector3 position)
+    {
+        transform.position = position;
+    }
+    public void SetPosition(Edge.Point position)
+    {
+        transform.position = position.ToVector();
     }
 }
