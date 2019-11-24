@@ -129,6 +129,12 @@ public class Graph : MonoBehaviour
 
             curPoint = pointA.Id;
             int wayPoint = pointB.Id;
+
+            if (d[wayPoint] == INF)
+            {
+                GDebug.LogError("Невозможно построить путь.");
+                return;
+            }
             int h = 0;
             lineRenderer = GetComponent<LineRenderer>();
             lineRenderer.positionCount = 0;
@@ -312,14 +318,15 @@ public class Graph : MonoBehaviour
     public void DeleteAllEdges()
     {
         edges.Clear();
-        for (int i = 0; i < MAX_POINTS_COUNT; i++)
+        for (int i = 0; i <= MAX_POINTS_COUNT; i++)
         {
-            for (int j = 0; i < MAX_POINTS_COUNT; i++)
+            for (int j = 0; i <= MAX_POINTS_COUNT; i++)
             {
                 sizeMatrix[i, j] = INF;
                 sizeMatrix[j, i] = INF;
             }
         }
+        Update();
     }
 
     public void ClearPath()
