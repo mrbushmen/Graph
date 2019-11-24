@@ -23,7 +23,7 @@ public class Graph : MonoBehaviour
     /// <summary>
     /// Максимальное количество вершин графа
     /// </summary>
-    private const int MAX_POINTS_COUNT = 10;
+    public const int MAX_POINTS_COUNT = 10;
     
     private List<GraphPoint> graphPoints = new List<GraphPoint>();
     private List<GraphPoint> selectedPoints = new List<GraphPoint>();
@@ -31,9 +31,9 @@ public class Graph : MonoBehaviour
     /// <summary>
     /// Все ребра графа
     /// </summary>
-    private List<Edge> edges = new List<Edge>();
+    public List<Edge> edges = new List<Edge>();
 
-    private float[,] sizeMatrix = new float[MAX_POINTS_COUNT+1, MAX_POINTS_COUNT + 1];
+    public float[,] sizeMatrix = new float[MAX_POINTS_COUNT+1, MAX_POINTS_COUNT + 1];
 
     //Длины кратчайших путей от текущей точки до всех остальных
     private float[] d = new float[MAX_POINTS_COUNT + 1];
@@ -342,5 +342,18 @@ public class Graph : MonoBehaviour
         }
 
         return selectedPoints.Count == 2;
+    }
+
+    public void Save()
+    {
+        SaveSystem.SaveGraph(this);
+    }
+
+    public void Load()
+    {
+        var data = SaveSystem.LoadGraph();
+
+        sizeMatrix = data.sizeMatrix;
+        edges = data.edges;
     }
 }

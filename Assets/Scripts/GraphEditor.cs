@@ -69,6 +69,14 @@ public class GraphEditor : EditorWindow
         {
             Graph.ClearPath();
         }
+        if (GUILayout.Button("Сохранить"))
+        {
+            Graph.Save();
+        }
+        if (GUILayout.Button("Загрузить"))
+        {
+            Graph.Load();
+        }
 
         GUILayout.Label("Настройки", headStyle);
         PointColor = EditorGUILayout.ColorField("Цвет вершины", PointColor);

@@ -5,6 +5,7 @@ using UnityEngine;
 /// <summary>
 /// Вершина графа
 /// </summary>
+[System.Serializable]
 [ExecuteInEditMode]
 public class GraphPoint : MonoBehaviour
 {
